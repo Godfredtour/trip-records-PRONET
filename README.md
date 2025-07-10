@@ -3,26 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trip Records</title>
+  <title>Auto Trip Records</title>
   <style>
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #printable-area, #printable-area * {
-        visibility: visible;
-      }
-      #printable-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-      .no-print {
-        display: none !important;
-      }
-    }
-
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -113,24 +95,10 @@
     button.danger:hover {
       background: #d32f2f;
     }
-    button.secondary {
-      background: #2196F3;
-    }
-    button.secondary:hover {
-      background: #0b7dda;
-    }
     .actions {
       margin: 15px auto;
       max-width: 800px;
       text-align: center;
-    }
-    .welcome-message {
-      background: #e7f3fe;
-      padding: 15px;
-      margin: 15px auto;
-      max-width: 800px;
-      border-left: 6px solid #2196F3;
-      border-radius: 3px;
     }
     .form-row {
       display: flex;
@@ -148,9 +116,16 @@
       margin-bottom: 3px;
       font-weight: bold;
     }
-    #printable-area {
-      margin: 0 auto;
-      max-width: 800px;
+    @media print {
+      .no-print, .form-container, .actions {
+        display: none !important;
+      }
+      table {
+        page-break-inside: auto;
+      }
+      tr {
+        page-break-inside: avoid;
+      }
     }
   </style>
 </head>
@@ -163,329 +138,313 @@
   </div>
   <div class="contact-info">
     <p>Address: P.O. Box 360, Wa | Phone: +33 (0392) 29343 | Fax: +33 (0392) 29348</p>
-    <p>e-mail: francova@gmail.com | website: pronetwa@afficaonline.com.gh | http://www.pronet-ghana.org</p>
+    <p>e-mail: francova@gmail.com | website: pronetwa@afficaonline.com.gh</p>
   </div>
 
-  <div id="printable-area">
-    <h2 style="text-align: center; font-size: 16px; margin: 10px 0;">TRIP RECORDS</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>DATE</th>
-          <th colspan="2">JOURNEY</th>
-          <th colspan="2">SPEEDOMETER</th>
-          <th>MILES</th>
-          <th>TIME</th>
-          <th colspan="2">FUEL BOUGHT</th>
-          <th>DRIVER SIGN</th>
-        </tr>
-        <tr>
-          <th></th>
-          <th>from</th>
-          <th>to</th>
-          <th>out</th>
-          <th>in</th>
-          <th></th>
-          <th></th>
-          <th>Diesel</th>
-          <th>Oil</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tripBody"></tbody>
-    </table>
-  </div>
-
-  <div class="welcome-message no-print" id="welcomeMessage">
-    <h3>Device ID: <span id="deviceId"></span></h3>
-    <p>Found <span id="savedTripsCount">0</span> existing trip records for this device.</p>
-    <button id="continueBtn">Continue Working</button>
-    <button id="newSessionBtn" class="danger">Start New Session</button>
-  </div>
-
-  <div class="form-container no-print" id="inputForm" style="display: none;">
-    <div class="form-row">
-      <div class="form-group">
-        <label>DATE</label>
-        <input type="date" id="date">
-      </div>
-      <div class="form-group">
-        <label>JOURNEY</label>
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <input type="text" id="from" placeholder="From" list="communities" style="flex: 1;">
-          <span>to</span>
-          <input type="text" id="to" placeholder="To" list="communities" style="flex: 1;">
+  <div class="form-container no-print">
+    <h3>Add New Trip</h3>
+    <form id="tripForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>DATE</label>
+          <input type="date" id="date">
+        </div>
+        <div class="form-group">
+          <label>FROM</label>
+          <input type="text" id="from" placeholder="Starting location" list="communities">
+        </div>
+        <div class="form-group">
+          <label>TO</label>
+          <input type="text" id="to" placeholder="Destination" list="communities" disabled>
         </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>SPEEDOMETER</label>
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <input type="number" id="out" placeholder="Out" style="flex: 1;">
-          <span>/</span>
-          <input type="number" id="in" placeholder="In" style="flex: 1;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>START TIME</label>
+          <input type="time" id="startTime">
+        </div>
+        <div class="form-group">
+          <label>END TIME</label>
+          <input type="time" id="endTime" disabled>
+        </div>
+        <div class="form-group">
+          <label>SPEEDOMETER START</label>
+          <input type="number" id="odoStart">
+        </div>
+        <div class="form-group">
+          <label>SPEEDOMETER END</label>
+          <input type="number" id="odoEnd" disabled>
         </div>
       </div>
-      <div class="form-group">
-        <label>MILES</label>
-        <input type="number" id="miles">
-      </div>
-      <div class="form-group">
-        <label>TIME</label>
-        <input type="time" id="time">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>FUEL BOUGHT</label>
-        <div style="display: flex; gap: 5px;">
-          <input type="number" id="diesel" placeholder="Diesel" style="flex: 1;">
-          <input type="number" id="oil" placeholder="Oil" style="flex: 1;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>FUEL (Diesel)</label>
+          <input type="number" id="diesel">
+        </div>
+        <div class="form-group">
+          <label>FUEL (Oil)</label>
+          <input type="number" id="oil">
+        </div>
+        <div class="form-group">
+          <label>DRIVER SIGN</label>
+          <input type="text" id="driverSign" placeholder="Driver's signature">
         </div>
       </div>
-      <div class="form-group">
-        <label>DRIVER SIGN</label>
-        <input type="text" id="driver">
+      <div class="form-row">
+        <button type="submit">Save Trip</button>
+        <button type="button" id="completeDayBtn">Complete Day's Trips</button>
       </div>
-      <div class="form-group" style="align-self: flex-end;">
-        <button type="submit" form="tripForm">Add Trip</button>
-      </div>
-    </div>
-    <form id="tripForm"></form>
+    </form>
   </div>
 
-  <div class="actions no-print" id="actionButtons" style="display: none;">
-    <button id="printBtn">Print Records</button>
-    <button id="exportBtn" class="secondary">Export Data</button>
-    <button id="importBtn" class="secondary">Import Data</button>
-    <button id="clearBtn" class="danger">Clear All</button>
+  <div class="actions no-print">
+    <button id="printBtn">Print Day's Records</button>
+    <button id="clearBtn" class="danger">Clear All Data</button>
   </div>
+
+  <table id="tripTable">
+    <thead>
+      <tr>
+        <th>DATE</th>
+        <th>FROM</th>
+        <th>TO</th>
+        <th>START TIME</th>
+        <th>END TIME</th>
+        <th>ODOMETER START</th>
+        <th>ODOMETER END</th>
+        <th>DIESEL</th>
+        <th>OIL</th>
+        <th>DRIVER SIGN</th>
+      </tr>
+    </thead>
+    <tbody id="tripBody"></tbody>
+  </table>
 
   <datalist id="communities">
-    <!-- Wa Municipal -->
-    <option value="Wa"></option>
-    <option value="Bamahu"></option>
-    <option value="Kambali"></option>
-    <option value="Dobile"></option>
-    <option value="Jongu"></option>
-    <option value="Kpongu"></option>
-    
-    <!-- Jirapa District -->
+    <!-- Comprehensive list of Upper West locations -->
+    <option value="Wa (Municipal Capital)"></option>
     <option value="Jirapa"></option>
-    <option value="Hain"></option>
-    <option value="Naro"></option>
-    <option value="Ullo"></option>
-    
-    <!-- All other districts and villages -->
     <option value="Lawra"></option>
+    <option value="Nadowli"></option>
+    <option value="Daffiama"></option>
     <option value="Nandom"></option>
-    <option value="Tumu"></option>
-    <option value="Gwollu"></option>
     <option value="Lambussie"></option>
-    <!-- Add all other communities as previously listed -->
+    <option value="Tumu (Sissala East)"></option>
+    <option value="Gwollu (Sissala West)"></option>
+    <option value="Hamile"></option>
+    <option value="Wechiau"></option>
+    <option value="Babile"></option>
+    <option value="Busa"></option>
+    <option value="Charikpong"></option>
+    <option value="Daboya"></option>
+    <option value="Eremon"></option>
+    <option value="Fian"></option>
+    <option value="Gbelinkaa"></option>
+    <option value="Goli"></option>
+    <option value="Kpaglagi"></option>
+    <option value="Kperisi"></option>
+    <option value="Kunyukuo"></option>
+    <option value="Loho"></option>
+    <option value="Mangu"></option>
+    <option value="Nakore"></option>
+    <option value="Nyoli"></option>
+    <option value="Sabuli"></option>
+    <option value="Takpo"></option>
+    <option value="Tizza"></option>
+    <option value="Ullo"></option>
+    <option value="Zukpiri"></option>
   </datalist>
 
   <script>
-    // Generate or retrieve device fingerprint
-    function getDeviceId() {
-      let deviceId = localStorage.getItem('deviceId');
-      if (!deviceId) {
-        // Create a more robust device fingerprint
-        const userAgent = navigator.userAgent;
-        const platform = navigator.platform;
-        const hardwareConcurrency = navigator.hardwareConcurrency || 'unknown';
-        const deviceMemory = navigator.deviceMemory || 'unknown';
-        
-        deviceId = 'dev-' + hashCode(`${userAgent}-${platform}-${hardwareConcurrency}-${deviceMemory}`).toString(36);
-        localStorage.setItem('deviceId', deviceId);
+    // Comprehensive list of Upper West locations with coordinates
+    const upperWestLocations = {
+      "Wa (Municipal Capital)": { lat: 10.060, lng: -2.500 },
+      "Jirapa": { lat: 10.533, lng: -2.733 },
+      "Lawra": { lat: 10.833, lng: -2.900 },
+      // Add all other locations with coordinates
+    };
+
+    // Initialize application
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
+      document.getElementById('date').value = dateStr;
+      
+      // Set current time as start time
+      const now = new Date();
+      const timeStr = now.toTimeString().substr(0, 5);
+      document.getElementById('startTime').value = timeStr;
+      
+      // Load any saved trips
+      loadTrips();
+      
+      // Enable location auto-fill if available
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(fillCurrentLocation, showError);
       }
-      return deviceId;
-    }
-
-    // Simple hash function
-    function hashCode(str) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash |= 0; // Convert to 32bit integer
-      }
-      return hash;
-    }
-
-    const deviceId = getDeviceId();
-    let trips = JSON.parse(localStorage.getItem(`trips_${deviceId}`)) || [];
-    const today = new Date().toISOString().split('T')[0];
-
-    // Initialize UI
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('deviceId').textContent = deviceId;
-      document.getElementById('savedTripsCount').textContent = trips.length;
-      document.getElementById('date').value = today;
-
-      if (trips.length > 0) {
-        document.getElementById('welcomeMessage').style.display = 'block';
-      } else {
-        startWorking();
-      }
+      
+      // Setup event listeners
+      setupEventHandlers();
     });
 
-    // Start working with existing or new data
-    function startWorking() {
-      document.getElementById('welcomeMessage').style.display = 'none';
-      document.getElementById('inputForm').style.display = 'block';
-      document.getElementById('actionButtons').style.display = 'block';
-      displayTrips();
+    // Fill current location if available
+    function fillCurrentLocation(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      
+      // Find nearest location from our list
+      let nearestLocation = "";
+      let minDistance = Infinity;
+      
+      for (const [location, coords] of Object.entries(upperWestLocations)) {
+        const distance = Math.sqrt(
+          Math.pow(lat - coords.lat, 2) + 
+          Math.pow(lng - coords.lng, 2)
+        );
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestLocation = location;
+        }
+      }
+      
+      if (nearestLocation) {
+        document.getElementById('from').value = nearestLocation;
+        document.getElementById('to').disabled = false;
+      }
     }
 
-    // Display trips in table
-    function displayTrips() {
-      const tripBody = document.getElementById('tripBody');
-      tripBody.innerHTML = '';
-      trips.forEach((trip) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${trip.date || today}</td>
-          <td>${trip.from || ''}</td>
-          <td>${trip.to || ''}</td>
-          <td>${trip.out || ''}</td>
-          <td>${trip.in || ''}</td>
-          <td>${trip.miles || ''}</td>
-          <td>${trip.time || ''}</td>
-          <td>${trip.diesel || ''}</td>
-          <td>${trip.oil || ''}</td>
-          <td>${trip.driver || ''}</td>
-        `;
-        tripBody.appendChild(row);
+    function showError(error) {
+      console.log("Geolocation error:", error);
+      // Proceed without auto-fill if location not available
+      document.getElementById('to').disabled = false;
+    }
+
+    function setupEventHandlers() {
+      // Auto-fill end time when start time changes
+      document.getElementById('startTime').addEventListener('change', function() {
+        const startTime = this.value;
+        if (startTime) {
+          const [hours, minutes] = startTime.split(':');
+          let endHours = parseInt(hours) + 1; // Default 1 hour trip
+          if (endHours >= 20) endHours = 20; // Cap at 8pm
+          document.getElementById('endTime').value = `${endHours.toString().padStart(2, '0')}:${minutes}`;
+          document.getElementById('endTime').disabled = false;
+        }
+      });
+      
+      // Auto-fill odometer end when start is entered
+      document.getElementById('odoStart').addEventListener('change', function() {
+        if (this.value) {
+          document.getElementById('odoEnd').disabled = false;
+        }
+      });
+      
+      // Form submission
+      document.getElementById('tripForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveTrip();
+      });
+      
+      // Complete day's trips
+      document.getElementById('completeDayBtn').addEventListener('click', function() {
+        if (confirm("Complete all trips for today and prepare for printing?")) {
+          completeDaysTrips();
+        }
+      });
+      
+      // Print button
+      document.getElementById('printBtn').addEventListener('click', function() {
+        window.print();
+      });
+      
+      // Clear button
+      document.getElementById('clearBtn').addEventListener('click', function() {
+        if (confirm("Clear ALL trip data?")) {
+          localStorage.clear();
+          document.getElementById('tripBody').innerHTML = '';
+        }
       });
     }
 
-    // Form submission
-    document.getElementById('tripForm').addEventListener('submit', (e) => {
-      e.preventDefault();
+    function saveTrip() {
       const trip = {
-        date: document.getElementById('date').value || today,
+        date: document.getElementById('date').value,
         from: document.getElementById('from').value,
         to: document.getElementById('to').value,
-        out: document.getElementById('out').value,
-        in: document.getElementById('in').value,
-        miles: document.getElementById('miles').value,
-        time: document.getElementById('time').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        odoStart: document.getElementById('odoStart').value,
+        odoEnd: document.getElementById('odoEnd').value,
         diesel: document.getElementById('diesel').value,
         oil: document.getElementById('oil').value,
-        driver: document.getElementById('driver').value
+        driverSign: document.getElementById('driverSign').value
       };
+      
+      // Save to localStorage
+      let trips = JSON.parse(localStorage.getItem('trips')) || [];
       trips.push(trip);
-      localStorage.setItem(`trips_${deviceId}`, JSON.stringify(trips));
-      displayTrips();
-      e.target.reset();
-      document.getElementById('date').value = today;
-    });
+      localStorage.setItem('trips', JSON.stringify(trips));
+      
+      // Add to table
+      addTripToTable(trip);
+      
+      // Reset form for next trip
+      resetFormForNextTrip();
+    }
 
-    // Button event listeners
-    document.getElementById('continueBtn').addEventListener('click', startWorking);
-    
-    document.getElementById('newSessionBtn').addEventListener('click', () => {
-      if (confirm('Start new session? This will clear existing data for this device.')) {
-        trips = [];
-        localStorage.setItem(`trips_${deviceId}`, JSON.stringify(trips));
-        startWorking();
+    function addTripToTable(trip) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${trip.date || ''}</td>
+        <td>${trip.from || ''}</td>
+        <td>${trip.to || ''}</td>
+        <td>${trip.startTime || ''}</td>
+        <td>${trip.endTime || ''}</td>
+        <td>${trip.odoStart || ''}</td>
+        <td>${trip.odoEnd || ''}</td>
+        <td>${trip.diesel || ''}</td>
+        <td>${trip.oil || ''}</td>
+        <td>${trip.driverSign || ''}</td>
+      `;
+      document.getElementById('tripBody').appendChild(row);
+    }
+
+    function resetFormForNextTrip() {
+      // Set "from" as previous "to"
+      const toValue = document.getElementById('to').value;
+      document.getElementById('from').value = toValue;
+      
+      // Clear other fields
+      document.getElementById('to').value = '';
+      document.getElementById('startTime').value = '';
+      document.getElementById('endTime').value = '';
+      document.getElementById('endTime').disabled = true;
+      document.getElementById('odoStart').value = document.getElementById('odoEnd').value;
+      document.getElementById('odoEnd').value = '';
+      document.getElementById('odoEnd').disabled = true;
+      document.getElementById('diesel').value = '';
+      document.getElementById('oil').value = '';
+      document.getElementById('driverSign').value = '';
+      
+      // Focus on next field
+      document.getElementById('to').focus();
+    }
+
+    function loadTrips() {
+      const trips = JSON.parse(localStorage.getItem('trips')) || [];
+      trips.forEach(trip => addTripToTable(trip));
+    }
+
+    function completeDaysTrips() {
+      // Add any final trip
+      if (document.getElementById('from').value && document.getElementById('to').value) {
+        saveTrip();
       }
-    });
-
-    document.getElementById('printBtn').addEventListener('click', () => {
-      const printWindow = window.open('', '', 'width=800,height=600');
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Trip Records Printout</title>
-            <style>
-              body { font-family: Arial; margin: 20px; }
-              table { width: 100%; border-collapse: collapse; }
-              th, td { border: 1px solid #000; padding: 5px; }
-              th { background-color: #f2f2f2; }
-              .header { text-align: center; margin-bottom: 15px; }
-              .contact-info { text-align: center; font-size: 11px; margin-bottom: 15px; }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <h1>ProNet North</h1>
-              <p>working in partnership for sustainable development</p>
-            </div>
-            <div class="contact-info">
-              <p>Address: P.O. Box 360, Wa | Phone: +33 (0392) 29343 | Fax: +33 (0392) 29348</p>
-              <p>e-mail: francova@gmail.com | website: pronetwa@afficaonline.com.gh</p>
-            </div>
-            <h2 style="text-align: center;">TRIP RECORDS</h2>
-            ${document.getElementById('printable-area').innerHTML}
-            <script>
-              window.onload = function() {
-                setTimeout(function() {
-                  window.print();
-                  window.close();
-                }, 200);
-              };
-            <\/script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    });
-
-    document.getElementById('exportBtn').addEventListener('click', () => {
-      const data = {
-        deviceId: deviceId,
-        trips: trips,
-        exportedAt: new Date().toISOString()
-      };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `trip-records-${deviceId}-${today}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    });
-
-    document.getElementById('importBtn').addEventListener('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = event => {
-          try {
-            const data = JSON.parse(event.target.result);
-            if (confirm(`Import ${data.trips.length} trips from ${data.deviceId}?`)) {
-              trips = data.trips;
-              localStorage.setItem(`trips_${deviceId}`, JSON.stringify(trips));
-              displayTrips();
-            }
-          } catch (err) {
-            alert('Error reading file: ' + err.message);
-          }
-        };
-        reader.readAsText(file);
-      };
-      input.click();
-    });
-
-    document.getElementById('clearBtn').addEventListener('click', () => {
-      if (confirm('Clear ALL trips for this device?')) {
-        trips = [];
-        localStorage.setItem(`trips_${deviceId}`, JSON.stringify(trips));
-        displayTrips();
-      }
-    });
-
-    // Save data before unload
-    window.addEventListener('beforeunload', () => {
-      localStorage.setItem(`trips_${deviceId}`, JSON.stringify(trips));
-    });
+      
+      // Prepare for printing
+      alert("Day's trips completed. Ready for printing.");
+    }
   </script>
 </body>
 </html>
