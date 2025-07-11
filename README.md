@@ -9,8 +9,11 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
+      padding: 0;
       background: #f5f5f5;
+      font-size: 14px;
     }
+    
     .header-container {
       background: linear-gradient(to right, #4CAF50, white);
       padding: 10px 0;
@@ -21,21 +24,23 @@
       text-align: center;
       margin: 0 auto;
       max-width: 800px;
+      padding: 0 10px;
     }
     .header h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: clamp(18px, 4vw, 22px);
       font-weight: bold;
       color: white;
       text-shadow: 1px 1px 2px #333;
     }
     .header p {
       margin: 3px 0;
-      font-size: 12px;
+      font-size: clamp(10px, 2.5vw, 12px);
       color: #333;
     }
+    
     .contact-info {
-      font-size: 11px;
+      font-size: clamp(9px, 2.5vw, 11px);
       text-align: center;
       margin: 5px auto;
       max-width: 800px;
@@ -44,6 +49,7 @@
       border-radius: 3px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
+    
     .form-container {
       background: white;
       padding: 15px;
@@ -53,39 +59,46 @@
       border-radius: 5px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
+    
     table {
       width: 100%;
       max-width: 800px;
       margin: 15px auto;
       border-collapse: collapse;
-      font-size: 12px;
+      font-size: clamp(10px, 2.5vw, 12px);
     }
     th, td {
       border: 1px solid #000;
-      padding: 5px;
+      padding: 4px;
       text-align: left;
+      word-break: break-word;
     }
     th {
       background-color: #f2f2f2;
       font-weight: bold;
     }
+    
     input {
       padding: 5px;
       margin: 3px 0;
-      font-size: 12px;
+      font-size: clamp(11px, 3vw, 12px);
       border: 1px solid #ddd;
       border-radius: 3px;
+      width: 100%;
+      box-sizing: border-box;
     }
+    
     button {
       padding: 7px 12px;
       margin: 5px;
-      font-size: 12px;
+      font-size: clamp(11px, 3vw, 12px);
       background: #4CAF50;
       color: white;
       border: none;
       border-radius: 3px;
       cursor: pointer;
       box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      white-space: nowrap;
     }
     button:hover {
       background: #45a049;
@@ -102,6 +115,13 @@
     button.secondary:hover {
       background: #0b7dda;
     }
+    button.file-btn {
+      background: #9C27B0;
+    }
+    button.file-btn:hover {
+      background: #7B1FA2;
+    }
+    
     .actions {
       margin: 15px auto;
       max-width: 800px;
@@ -121,7 +141,7 @@
       min-width: 120px;
     }
     label {
-      font-size: 12px;
+      font-size: clamp(11px, 3vw, 12px);
       display: block;
       margin-bottom: 3px;
       font-weight: bold;
@@ -129,6 +149,7 @@
     #printable-area {
       margin: 0 auto;
       max-width: 800px;
+      padding: 0 10px;
     }
     .print-header {
       display: flex;
@@ -138,15 +159,16 @@
       text-align: center;
     }
     .print-title {
-      font-size: 16px;
+      font-size: clamp(14px, 3.5vw, 16px);
       margin: 10px 0;
       width: 100%;
     }
     .vehicle-number {
-      font-size: 14px;
+      font-size: clamp(12px, 3vw, 14px);
       font-weight: bold;
       margin-top: 5px;
     }
+    
     #map {
       height: 200px;
       margin: 10px 0;
@@ -158,6 +180,7 @@
     .location-btn:hover {
       background: #F57C00;
     }
+    
     #tripBody tr {
       cursor: pointer;
     }
@@ -171,6 +194,51 @@
     .edit-btn:hover {
       background: #F57C00;
     }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 5px;
+      }
+      .form-group {
+        min-width: 100%;
+      }
+      table {
+        font-size: 11px;
+      }
+      th, td {
+        padding: 3px 2px;
+      }
+      button {
+        padding: 6px 10px;
+        margin: 3px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 16px;
+      }
+      .header p {
+        font-size: 10px;
+      }
+      .contact-info {
+        font-size: 9px;
+        padding: 3px;
+      }
+      table {
+        font-size: 10px;
+      }
+      input {
+        padding: 4px;
+        font-size: 11px;
+      }
+      button {
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+    }
+    
     @media print {
       body * {
         visibility: hidden;
@@ -198,6 +266,10 @@
       body {
         margin: 0;
         padding: 10px;
+        font-size: 12px;
+      }
+      table {
+        font-size: 10px;
       }
     }
   </style>
@@ -319,6 +391,7 @@
 
   <div class="actions no-print">
     <button id="printBtn">Print Records</button>
+    <button id="saveBtn" class="file-btn">Save to File</button>
     <button id="clearBtn" class="danger">Clear All Trips</button>
     <button id="toggleMap" class="secondary">Show Map</button>
   </div>
@@ -338,6 +411,8 @@
   </datalist>
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script>
     // Simple device identification
     function getDeviceId() {
@@ -574,6 +649,171 @@
       resetForm();
     }
 
+    // Android-friendly print function
+    async function handlePrint() {
+      try {
+        // Try regular print first
+        if (window.print && !/Android/i.test(navigator.userAgent)) {
+          window.print();
+        } else {
+          // Fallback for Android - generate PDF
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+            orientation: 'landscape'
+          });
+          
+          // Get printable content
+          const printableElement = document.createElement('div');
+          printableElement.innerHTML = `
+            <div style="text-align:center;margin-bottom:10px;">
+              <h2 style="color:#4CAF50;margin:0;">ProNet North</h2>
+              <p style="margin:5px 0;">working in partnership for sustainable development</p>
+              <p style="margin:5px 0;font-size:12px;">Address: P.O. Box 360, Wa | Phone: +33 (0392) 29343</p>
+              <h3 style="margin:10px 0;">TRIP RECORDS</h3>
+              <p style="margin:0;font-weight:bold;">${document.getElementById('printedVehicleNumber').textContent || ''}</p>
+            </div>
+            ${document.querySelector('table').outerHTML}
+          `;
+          
+          // Create PDF
+          await doc.html(printableElement, {
+            callback: function(doc) {
+              // For Android: Save as PDF
+              if (/Android/i.test(navigator.userAgent)) {
+                doc.save('TripRecords.pdf');
+              } else {
+                // For other devices - try printing PDF
+                const pdfBlob = doc.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                window.open(pdfUrl, '_blank');
+              }
+            },
+            x: 10,
+            y: 10,
+            width: 280, // Landscape width in mm
+            windowWidth: 800
+          });
+        }
+      } catch (error) {
+        console.error('Printing error:', error);
+        alert('Error generating print: ' + error.message);
+      }
+    }
+
+    // Save data to Word document
+    async function saveToFile() {
+      try {
+        // Load docx library dynamically if not already loaded
+        if (typeof docx === 'undefined') {
+          await loadScript('https://unpkg.com/docx@7.8.2/build/index.js');
+        }
+
+        const { Document, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, Packer, WidthType } = docx;
+        
+        // Create table rows for trips
+        const tripRows = trips.map(trip => new TableRow({
+            children: [
+                new TableCell({ children: [new Paragraph(trip.date || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.from || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.to || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.out || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.in || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.miles || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.timeOut || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.timeIn || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.petrol || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.diesel || '-')] }),
+                new TableCell({ children: [new Paragraph(trip.driver || '-')] })
+            ]
+        }));
+        
+        // Create document
+        const doc = new Document({
+            sections: [{
+                properties: {
+                    page: {
+                        size: {
+                            orientation: docx.PageOrientation.LANDSCAPE
+                        }
+                    }
+                },
+                children: [
+                    // Header
+                    new Paragraph({
+                        text: "ProNet North",
+                        heading: HeadingLevel.HEADING_1,
+                        alignment: AlignmentType.CENTER
+                    }),
+                    new Paragraph({
+                        text: "working in partnership for sustainable development",
+                        alignment: AlignmentType.CENTER
+                    }),
+                    new Paragraph({
+                        text: "TRIP RECORDS",
+                        heading: HeadingLevel.HEADING_2,
+                        alignment: AlignmentType.CENTER
+                    }),
+                    new Paragraph({
+                        text: `Vehicle: ${currentVehicleNumber || 'Not specified'}`,
+                        alignment: AlignmentType.CENTER,
+                        bold: true
+                    }),
+                    new Paragraph({ text: "" }), // Empty line
+                    
+                    // Table
+                    new Table({
+                        width: {
+                            size: 100,
+                            type: WidthType.PERCENTAGE
+                        },
+                        rows: [
+                            // Header row
+                            new TableRow({
+                                children: [
+                                    new TableCell({ children: [new Paragraph("DATE")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("FROM")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("TO")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("SPEEDO OUT")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("SPEEDO IN")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("MILES")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("TIME OUT")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("TIME IN")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("PETROL")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("DIESEL")], shading: { fill: "D9D9D9" } }),
+                                    new TableCell({ children: [new Paragraph("DRIVER")], shading: { fill: "D9D9D9" } })
+                                ]
+                            }),
+                            ...tripRows
+                        ]
+                    })
+                ]
+            }]
+        });
+
+        // Generate the Word document as a blob
+        const blob = await Packer.toBlob(doc);
+        
+        // Save the file using FileSaver.js
+        saveAs(blob, `TripRecords_${currentVehicleNumber || 'unknown'}_${new Date().toISOString().split('T')[0]}.docx`);
+        
+        alert('Trip records saved as Word document!');
+      } catch (error) {
+        console.error('Error saving file:', error);
+        alert('Error saving file: ' + error.message);
+      }
+    }
+
+    // Helper function to load scripts dynamically
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('date').value = today;
@@ -592,9 +832,8 @@
       
       document.getElementById('tripForm').addEventListener('submit', saveTrip);
       document.getElementById('cancelEdit').addEventListener('click', cancelEdit);
-      document.getElementById('printBtn').addEventListener('click', () => {
-        window.print();
-      });
+      document.getElementById('printBtn').addEventListener('click', handlePrint);
+      document.getElementById('saveBtn').addEventListener('click', saveToFile);
 
       document.getElementById('clearBtn').addEventListener('click', () => {
         if (confirm('Clear ALL trips for this device?')) {
