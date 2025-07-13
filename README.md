@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Trip Records</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
@@ -60,10 +60,16 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 15px auto;
+      max-width: 800px;
+    }
+    
     table {
       width: 100%;
-      max-width: 800px;
-      margin: 15px auto;
+      min-width: 700px;
       border-collapse: collapse;
       font-size: clamp(10px, 2.5vw, 12px);
     }
@@ -71,11 +77,13 @@
       border: 1px solid #000;
       padding: 4px;
       text-align: left;
-      word-break: break-word;
+      white-space: nowrap;
     }
     th {
       background-color: #f2f2f2;
       font-weight: bold;
+      position: sticky;
+      top: 0;
     }
     
     input {
@@ -132,12 +140,14 @@
     }
     .form-row {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
       margin-bottom: 8px;
       gap: 10px;
+      padding-bottom: 15px;
     }
     .form-group {
-      flex: 1;
+      flex: 0 0 auto;
       min-width: 120px;
     }
     label {
@@ -196,22 +206,8 @@
     }
     
     @media (max-width: 768px) {
-      .form-row {
-        flex-direction: column;
-        gap: 5px;
-      }
       .form-group {
-        min-width: 100%;
-      }
-      table {
-        font-size: 11px;
-      }
-      th, td {
-        padding: 3px 2px;
-      }
-      button {
-        padding: 6px 10px;
-        margin: 3px;
+        min-width: 100px;
       }
     }
     
@@ -226,9 +222,6 @@
         font-size: 9px;
         padding: 3px;
       }
-      table {
-        font-size: 10px;
-      }
       input {
         padding: 4px;
         font-size: 11px;
@@ -236,6 +229,9 @@
       button {
         padding: 5px 8px;
         font-size: 11px;
+      }
+      .table-container {
+        padding-bottom: 20px;
       }
     }
     
@@ -291,35 +287,37 @@
       <h2 class="print-title">TRIP RECORDS</h2>
       <div class="vehicle-number" id="printedVehicleNumber"></div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>DATE</th>
-          <th colspan="2">JOURNEY</th>
-          <th colspan="2">SPEEDOMETER</th>
-          <th>MILES</th>
-          <th colspan="2">TIME</th>
-          <th colspan="2">FUEL BOUGHT</th>
-          <th>DRIVER SIGN</th>
-          <th class="no-print">ACTION</th>
-        </tr>
-        <tr>
-          <th></th>
-          <th>from</th>
-          <th>to</th>
-          <th>out</th>
-          <th>in</th>
-          <th></th>
-          <th>out</th>
-          <th>in</th>
-          <th>Petrol</th>
-          <th>Diesel</th>
-          <th></th>
-          <th class="no-print"></th>
-        </tr>
-      </thead>
-      <tbody id="tripBody"></tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>DATE</th>
+            <th colspan="2">JOURNEY</th>
+            <th colspan="2">SPEEDOMETER</th>
+            <th>MILES</th>
+            <th colspan="2">TIME</th>
+            <th colspan="2">FUEL BOUGHT</th>
+            <th>DRIVER SIGN</th>
+            <th class="no-print">ACTION</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th>from</th>
+            <th>to</th>
+            <th>out</th>
+            <th>in</th>
+            <th></th>
+            <th>out</th>
+            <th>in</th>
+            <th>Petrol</th>
+            <th>Diesel</th>
+            <th></th>
+            <th class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody id="tripBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="form-container no-print">
