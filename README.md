@@ -65,6 +65,8 @@
       -webkit-overflow-scrolling: touch;
       margin: 15px auto;
       max-width: 800px;
+      border: 1px solid #ddd;
+      background: white;
     }
     
     table {
@@ -75,7 +77,7 @@
     }
     th, td {
       border: 1px solid #000;
-      padding: 4px;
+      padding: 6px;
       text-align: left;
       white-space: nowrap;
     }
@@ -87,7 +89,7 @@
     }
     
     input {
-      padding: 5px;
+      padding: 6px;
       margin: 3px 0;
       font-size: clamp(11px, 3vw, 12px);
       border: 1px solid #ddd;
@@ -97,7 +99,7 @@
     }
     
     button {
-      padding: 7px 12px;
+      padding: 8px 12px;
       margin: 5px;
       font-size: clamp(11px, 3vw, 12px);
       background: #4CAF50;
@@ -209,6 +211,9 @@
       .form-group {
         min-width: 100px;
       }
+      th, td {
+        padding: 4px;
+      }
     }
     
     @media (max-width: 480px) {
@@ -223,11 +228,11 @@
         padding: 3px;
       }
       input {
-        padding: 4px;
+        padding: 5px;
         font-size: 11px;
       }
       button {
-        padding: 5px 8px;
+        padding: 6px 10px;
         font-size: 11px;
       }
       .table-container {
@@ -267,6 +272,9 @@
       table {
         font-size: 10px;
       }
+      .table-container {
+        overflow: visible;
+      }
     }
   </style>
 </head>
@@ -284,8 +292,7 @@
 
   <div id="printable-area">
     <div class="print-header">
-      <h2 class="print-title">TRIP RECORDS</h2>
-      <div class="vehicle-number" id="printedVehicleNumber"></div>
+      <h2 class="print-title">TRIP RECORDS - <span id="printedVehicleNumber"></span></h2>
     </div>
     <div class="table-container">
       <table>
@@ -327,21 +334,21 @@
       <div class="form-row">
         <div class="form-group">
           <label>VEHICLE NUMBER</label>
-          <input type="text" id="vehicleNumber">
+          <input type="text" id="vehicleNumber" required>
         </div>
         <div class="form-group">
           <label>DATE</label>
-          <input type="date" id="date">
+          <input type="date" id="date" required>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>JOURNEY</label>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <input type="text" id="from" placeholder="From" list="communities">
+            <input type="text" id="from" placeholder="From" list="communities" required>
             <button type="button" id="detectLocation" class="location-btn">Detect Location</button>
             <span>to</span>
-            <input type="text" id="to" placeholder="To" list="communities">
+            <input type="text" id="to" placeholder="To" list="communities" required>
           </div>
         </div>
       </div>
@@ -349,35 +356,35 @@
         <div class="form-group">
           <label>SPEEDOMETER</label>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <input type="number" id="out" placeholder="Out">
+            <input type="number" id="out" placeholder="Out" required>
             <span>/</span>
-            <input type="number" id="in" placeholder="In">
+            <input type="number" id="in" placeholder="In" required>
           </div>
         </div>
         <div class="form-group">
           <label>MILES</label>
-          <input type="number" id="miles">
+          <input type="number" id="miles" required>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>TIME</label>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <input type="time" id="timeOut" placeholder="Out">
+            <input type="time" id="timeOut" placeholder="Out" required>
             <span>/</span>
-            <input type="time" id="timeIn" placeholder="In">
+            <input type="time" id="timeIn" placeholder="In" required>
           </div>
         </div>
         <div class="form-group">
           <label>FUEL BOUGHT</label>
           <div style="display: flex; gap: 5px;">
-            <input type="number" id="petrol" placeholder="Petrol">
-            <input type="number" id="diesel" placeholder="Diesel">
+            <input type="number" id="petrol" placeholder="Petrol" value="0">
+            <input type="number" id="diesel" placeholder="Diesel" value="0">
           </div>
         </div>
         <div class="form-group">
           <label>DRIVER SIGN</label>
-          <input type="text" id="driver">
+          <input type="text" id="driver" required>
         </div>
         <div class="form-group" style="align-self: flex-end;">
           <button type="submit" id="submitBtn">Add Trip</button>
@@ -533,6 +540,11 @@
     function displayTrips() {
       const tripBody = document.getElementById('tripBody');
       tripBody.innerHTML = '';
+      
+      // Update printed vehicle number
+      document.getElementById('printedVehicleNumber').textContent = 
+        currentVehicleNumber ? currentVehicleNumber : 'No Vehicle Specified';
+      
       trips.forEach((trip, index) => {
         const row = document.createElement('tr');
         row.dataset.index = index;
@@ -595,6 +607,9 @@
       // Update button states
       document.getElementById('submitBtn').textContent = 'Update Trip';
       document.getElementById('cancelEdit').style.display = 'inline-block';
+      
+      // Scroll to form
+      document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
     }
 
     // Cancel editing
@@ -619,6 +634,13 @@
     function saveTrip(e) {
       e.preventDefault();
       
+      // Get vehicle number and update if changed
+      const newVehicleNumber = document.getElementById('vehicleNumber').value.trim();
+      if (newVehicleNumber && newVehicleNumber !== currentVehicleNumber) {
+        currentVehicleNumber = newVehicleNumber;
+        localStorage.setItem(`vehicleNumber_${deviceId}`, currentVehicleNumber);
+      }
+      
       const trip = {
         date: document.getElementById('date').value,
         from: document.getElementById('from').value,
@@ -628,8 +650,8 @@
         miles: document.getElementById('miles').value,
         timeOut: document.getElementById('timeOut').value,
         timeIn: document.getElementById('timeIn').value,
-        petrol: document.getElementById('petrol').value,
-        diesel: document.getElementById('diesel').value,
+        petrol: document.getElementById('petrol').value || '0',
+        diesel: document.getElementById('diesel').value || '0',
         driver: document.getElementById('driver').value
       };
 
@@ -647,6 +669,19 @@
       resetForm();
     }
 
+    // Generate HTML for print/save
+    function generatePrintableHTML() {
+      return `
+        <div style="text-align:center;margin-bottom:10px;">
+          <h2 style="color:#4CAF50;margin:0;">ProNet North</h2>
+          <p style="margin:5px 0;">working in partnership for sustainable development</p>
+          <p style="margin:5px 0;font-size:12px;">Address: P.O. Box 360, Wa | Phone: +33 (0392) 29343</p>
+          <h3 style="margin:10px 0;">TRIP RECORDS - ${currentVehicleNumber || 'No Vehicle Specified'}</h3>
+        </div>
+        ${document.querySelector('table').outerHTML}
+      `;
+    }
+
     // Android-friendly print function
     async function handlePrint() {
       try {
@@ -662,16 +697,7 @@
           
           // Get printable content
           const printableElement = document.createElement('div');
-          printableElement.innerHTML = `
-            <div style="text-align:center;margin-bottom:10px;">
-              <h2 style="color:#4CAF50;margin:0;">ProNet North</h2>
-              <p style="margin:5px 0;">working in partnership for sustainable development</p>
-              <p style="margin:5px 0;font-size:12px;">Address: P.O. Box 360, Wa | Phone: +33 (0392) 29343</p>
-              <h3 style="margin:10px 0;">TRIP RECORDS</h3>
-              <p style="margin:0;font-weight:bold;">${document.getElementById('printedVehicleNumber').textContent || ''}</p>
-            </div>
-            ${document.querySelector('table').outerHTML}
-          `;
+          printableElement.innerHTML = generatePrintableHTML();
           
           // Create PDF
           await doc.html(printableElement, {
@@ -698,125 +724,41 @@
       }
     }
 
-    // Save data to Word document
+    // Save data to PDF file (matching print layout)
     async function saveToFile() {
       try {
-        // Load docx library dynamically if not already loaded
-        if (typeof docx === 'undefined') {
-          await loadScript('https://unpkg.com/docx@7.8.2/build/index.js');
-        }
-
-        const { Document, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, Packer, WidthType } = docx;
-        
-        // Create table rows for trips
-        const tripRows = trips.map(trip => new TableRow({
-            children: [
-                new TableCell({ children: [new Paragraph(trip.date || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.from || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.to || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.out || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.in || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.miles || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.timeOut || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.timeIn || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.petrol || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.diesel || '-')] }),
-                new TableCell({ children: [new Paragraph(trip.driver || '-')] })
-            ]
-        }));
-        
-        // Create document
-        const doc = new Document({
-            sections: [{
-                properties: {
-                    page: {
-                        size: {
-                            orientation: docx.PageOrientation.LANDSCAPE
-                        }
-                    }
-                },
-                children: [
-                    // Header
-                    new Paragraph({
-                        text: "ProNet North",
-                        heading: HeadingLevel.HEADING_1,
-                        alignment: AlignmentType.CENTER
-                    }),
-                    new Paragraph({
-                        text: "working in partnership for sustainable development",
-                        alignment: AlignmentType.CENTER
-                    }),
-                    new Paragraph({
-                        text: "TRIP RECORDS",
-                        heading: HeadingLevel.HEADING_2,
-                        alignment: AlignmentType.CENTER
-                    }),
-                    new Paragraph({
-                        text: `Vehicle: ${currentVehicleNumber || 'Not specified'}`,
-                        alignment: AlignmentType.CENTER,
-                        bold: true
-                    }),
-                    new Paragraph({ text: "" }), // Empty line
-                    
-                    // Table
-                    new Table({
-                        width: {
-                            size: 100,
-                            type: WidthType.PERCENTAGE
-                        },
-                        rows: [
-                            // Header row
-                            new TableRow({
-                                children: [
-                                    new TableCell({ children: [new Paragraph("DATE")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("FROM")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("TO")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("SPEEDO OUT")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("SPEEDO IN")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("MILES")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("TIME OUT")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("TIME IN")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("PETROL")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("DIESEL")], shading: { fill: "D9D9D9" } }),
-                                    new TableCell({ children: [new Paragraph("DRIVER")], shading: { fill: "D9D9D9" } })
-                                ]
-                            }),
-                            ...tripRows
-                        ]
-                    })
-                ]
-            }]
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'landscape'
         });
-
-        // Generate the Word document as a blob
-        const blob = await Packer.toBlob(doc);
         
-        // Save the file using FileSaver.js
-        saveAs(blob, `TripRecords_${currentVehicleNumber || 'unknown'}_${new Date().toISOString().split('T')[0]}.docx`);
+        // Get printable content
+        const printableElement = document.createElement('div');
+        printableElement.innerHTML = generatePrintableHTML();
         
-        alert('Trip records saved as Word document!');
+        // Create PDF
+        await doc.html(printableElement, {
+          callback: function(doc) {
+            const fileName = `TripRecords_${currentVehicleNumber || 'unknown'}_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+          },
+          x: 10,
+          y: 10,
+          width: 280, // Landscape width in mm
+          windowWidth: 800
+        });
+        
       } catch (error) {
         console.error('Error saving file:', error);
         alert('Error saving file: ' + error.message);
       }
     }
 
-    // Helper function to load scripts dynamically
-    function loadScript(src) {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('date').value = today;
       document.getElementById('vehicleNumber').value = currentVehicleNumber;
-      document.getElementById('printedVehicleNumber').textContent = currentVehicleNumber ? `Vehicle: ${currentVehicleNumber}` : '';
+      document.getElementById('printedVehicleNumber').textContent = currentVehicleNumber || 'No Vehicle Specified';
       setCurrentTime();
       displayTrips();
       initMap();
@@ -839,9 +781,18 @@
           currentVehicleNumber = '';
           localStorage.setItem(`trips_${deviceId}`, JSON.stringify(trips));
           localStorage.setItem(`vehicleNumber_${deviceId}`, '');
-          document.getElementById('printedVehicleNumber').textContent = '';
+          document.getElementById('printedVehicleNumber').textContent = 'No Vehicle Specified';
           displayTrips();
+          resetForm();
         }
+      });
+      
+      // Handle vehicle number changes
+      document.getElementById('vehicleNumber').addEventListener('change', function() {
+        currentVehicleNumber = this.value.trim();
+        localStorage.setItem(`vehicleNumber_${deviceId}`, currentVehicleNumber);
+        document.getElementById('printedVehicleNumber').textContent = 
+          currentVehicleNumber || 'No Vehicle Specified';
       });
     });
 
