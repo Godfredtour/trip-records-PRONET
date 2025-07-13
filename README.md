@@ -334,21 +334,21 @@
       <div class="form-row">
         <div class="form-group">
           <label>VEHICLE NUMBER</label>
-          <input type="text" id="vehicleNumber" required>
+          <input type="text" id="vehicleNumber">
         </div>
         <div class="form-group">
           <label>DATE</label>
-          <input type="date" id="date" required>
+          <input type="date" id="date">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>JOURNEY</label>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <input type="text" id="from" placeholder="From" list="communities" required>
+            <input type="text" id="from" placeholder="From" list="communities">
             <button type="button" id="detectLocation" class="location-btn">Detect Location</button>
             <span>to</span>
-            <input type="text" id="to" placeholder="To" list="communities" required>
+            <input type="text" id="to" placeholder="To" list="communities">
           </div>
         </div>
       </div>
@@ -356,23 +356,23 @@
         <div class="form-group">
           <label>SPEEDOMETER</label>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <input type="number" id="out" placeholder="Out" required>
+            <input type="number" id="out" placeholder="Out">
             <span>/</span>
-            <input type="number" id="in" placeholder="In" required>
+            <input type="number" id="in" placeholder="In">
           </div>
         </div>
         <div class="form-group">
           <label>MILES</label>
-          <input type="number" id="miles" required>
+          <input type="number" id="miles" placeholder="Calculated automatically">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>TIME</label>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <input type="time" id="timeOut" placeholder="Out" required>
+            <input type="time" id="timeOut" placeholder="Out">
             <span>/</span>
-            <input type="time" id="timeIn" placeholder="In" required>
+            <input type="time" id="timeIn" placeholder="In">
           </div>
         </div>
         <div class="form-group">
@@ -384,7 +384,7 @@
         </div>
         <div class="form-group">
           <label>DRIVER SIGN</label>
-          <input type="text" id="driver" required>
+          <input type="text" id="driver" placeholder="Optional">
         </div>
         <div class="form-group" style="align-self: flex-end;">
           <button type="submit" id="submitBtn">Add Trip</button>
@@ -536,6 +536,18 @@
       document.getElementById('timeOut').value = `${hours}:${minutes}`;
     }
 
+    // Calculate miles automatically when speedometer values change
+    function calculateMiles() {
+      const out = parseFloat(document.getElementById('out').value) || 0;
+      const inVal = parseFloat(document.getElementById('in').value) || 0;
+      
+      if (inVal > out) {
+        document.getElementById('miles').value = (inVal - out).toFixed(1);
+      } else {
+        document.getElementById('miles').value = '';
+      }
+    }
+
     // Display trips in table
     function displayTrips() {
       const tripBody = document.getElementById('tripBody');
@@ -623,6 +635,8 @@
       document.getElementById('tripForm').reset();
       document.getElementById('date').value = today;
       document.getElementById('vehicleNumber').value = currentVehicleNumber;
+      document.getElementById('petrol').value = '0';
+      document.getElementById('diesel').value = '0';
       setCurrentTime();
       
       document.getElementById('submitBtn').textContent = 'Add Trip';
@@ -636,23 +650,23 @@
       
       // Get vehicle number and update if changed
       const newVehicleNumber = document.getElementById('vehicleNumber').value.trim();
-      if (newVehicleNumber && newVehicleNumber !== currentVehicleNumber) {
+      if (newVehicleNumber !== currentVehicleNumber) {
         currentVehicleNumber = newVehicleNumber;
         localStorage.setItem(`vehicleNumber_${deviceId}`, currentVehicleNumber);
       }
       
       const trip = {
-        date: document.getElementById('date').value,
-        from: document.getElementById('from').value,
-        to: document.getElementById('to').value,
-        out: document.getElementById('out').value,
-        in: document.getElementById('in').value,
-        miles: document.getElementById('miles').value,
-        timeOut: document.getElementById('timeOut').value,
-        timeIn: document.getElementById('timeIn').value,
+        date: document.getElementById('date').value || today,
+        from: document.getElementById('from').value || '',
+        to: document.getElementById('to').value || '',
+        out: document.getElementById('out').value || '',
+        in: document.getElementById('in').value || '',
+        miles: document.getElementById('miles').value || '',
+        timeOut: document.getElementById('timeOut').value || '',
+        timeIn: document.getElementById('timeIn').value || '',
         petrol: document.getElementById('petrol').value || '0',
         diesel: document.getElementById('diesel').value || '0',
-        driver: document.getElementById('driver').value
+        driver: document.getElementById('driver').value || ''
       };
 
       if (editingIndex !== null) {
@@ -759,6 +773,8 @@
       document.getElementById('date').value = today;
       document.getElementById('vehicleNumber').value = currentVehicleNumber;
       document.getElementById('printedVehicleNumber').textContent = currentVehicleNumber || 'No Vehicle Specified';
+      document.getElementById('petrol').value = '0';
+      document.getElementById('diesel').value = '0';
       setCurrentTime();
       displayTrips();
       initMap();
@@ -774,6 +790,10 @@
       document.getElementById('cancelEdit').addEventListener('click', cancelEdit);
       document.getElementById('printBtn').addEventListener('click', handlePrint);
       document.getElementById('saveBtn').addEventListener('click', saveToFile);
+
+      // Auto-calculate miles when speedometer values change
+      document.getElementById('out').addEventListener('change', calculateMiles);
+      document.getElementById('in').addEventListener('change', calculateMiles);
 
       document.getElementById('clearBtn').addEventListener('click', () => {
         if (confirm('Clear ALL trips for this device?')) {
