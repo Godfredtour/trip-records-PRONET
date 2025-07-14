@@ -396,7 +396,7 @@
 
   <div class="actions no-print">
     <button id="printBtn">Print Records</button>
-    <button id="saveBtn" class="file-btn">Save to File</button>
+    <button id="saveBtn" class="file-btn">Save to File (PDF)</button>
     <button id="clearBtn" class="danger">Clear All Trips</button>
     <button id="toggleMap" class="secondary">Show Map</button>
   </div>
@@ -738,19 +738,20 @@
       }
     }
 
-    // Save data to PDF file (matching print layout)
-    async function saveToFile() {
+    // Save data to PDF file (matches print layout)
+    async function saveToPDF() {
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
-          orientation: 'landscape'
+          orientation: 'landscape',
+          unit: 'mm'
         });
-        
+
         // Get printable content
         const printableElement = document.createElement('div');
         printableElement.innerHTML = generatePrintableHTML();
         
-        // Create PDF
+        // Create PDF (using html method for better formatting)
         await doc.html(printableElement, {
           callback: function(doc) {
             const fileName = `TripRecords_${currentVehicleNumber || 'unknown'}_${new Date().toISOString().split('T')[0]}.pdf`;
@@ -763,8 +764,8 @@
         });
         
       } catch (error) {
-        console.error('Error saving file:', error);
-        alert('Error saving file: ' + error.message);
+        console.error('Error saving PDF:', error);
+        alert('Error saving PDF: ' + error.message);
       }
     }
 
@@ -789,7 +790,7 @@
       document.getElementById('tripForm').addEventListener('submit', saveTrip);
       document.getElementById('cancelEdit').addEventListener('click', cancelEdit);
       document.getElementById('printBtn').addEventListener('click', handlePrint);
-      document.getElementById('saveBtn').addEventListener('click', saveToFile);
+      document.getElementById('saveBtn').addEventListener('click', saveToPDF);
 
       // Auto-calculate miles when speedometer values change
       document.getElementById('out').addEventListener('change', calculateMiles);
